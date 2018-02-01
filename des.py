@@ -4,7 +4,7 @@ import collections
 try:
     plain = open("input1.txt", "r")
     key = open("key1.txt", "r")
-    output = open("output1.txt", "r")
+    output = open("output1.txt", "w")
 except IOError:
     print('Could not find a file')
     exit()
@@ -22,7 +22,7 @@ for c in string.punctuation:
     pt = pt.replace(" ", "")
 print(pt)
 
-#building vigenere square. Pulled from https://stackoverflow.com/questions/19882621/for-kasiski-test-how-to-implement-26x26-table-in-python
+# building vigenere square. Pulled from https://stackoverflow.com/questions/19882621/for-kasiski-test-how-to-implement-26x26-table-in-python
 
 def vigsquare(printable=False):
     '''
@@ -53,7 +53,23 @@ def vigenere(row, column):
     return vigsquare()[rowindex*26 + columnindex]
 
 print(vigsquare(printable=True))
-print(vigenere('L', 'G'))
+# print(vigenere('L', 'G'))
+# mnext step-run vigenere(plaintext, key) character by character until the end of the plain text.
+# Repeat the key when needed(every 16 chars)
+i = 0
+
+poly = ''
+for c in pt:
+    if i == 16:
+        i = 0;
+    poly += vigenere(c, kt[i])
+    output.write(vigenere(c, kt[i]))
+    # print(vigenere(c, kt[i]))
+    i += 1
+print(poly)
+
+
+
 
 
 
