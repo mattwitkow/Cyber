@@ -59,14 +59,57 @@ print(vigsquare(printable=True))
 i = 0
 
 poly = ''
+output.write("Poly Sub")
+# i val also helps with the padding step
 for c in pt:
     if i == 16:
         i = 0;
     poly += vigenere(c, kt[i])
     output.write(vigenere(c, kt[i]))
-    # print(vigenere(c, kt[i]))
     i += 1
+
+# padding for 4x4 blocks
+while i < 16:
+    poly += "A"
+    output.write("Padding")
+    output.write("A")
+    i += 1
+
+# start shifting
+blockNum = poly.__len__() / 16
+i = 0       # total text indexing
+j = 0       # inside block indexing
+#while blockNum > 0:
+#    row1 = poly[0 + i: i + 4]
+#    row2 = poly[4 + i:4 + i + 4]
+ #   row3 = poly[8 + i:8 + i + 4]
+  #  row4 = poly[12 + i: 12 + i + 4]
+    #print(row1, row2, row3, row4)
+   # blockNum -= 1
+    #i += 16
+
+while blockNum > 0:
+    row1 = poly[0 + i: i + 4]
+    row2 = poly[4 + i:4 + i + 4]
+    row2 = row2[1:]+row2[:1]
+    poly[4 + i: 4 + i + 4] = row2       #FIX THIS. STRINGS ARE IMMUTABLE
+    row3 = poly[8 + i:8 + i + 4]
+    row3 = row3[2:]+row3[:2]
+    poly[8 + i: 8 + i + 4] = row3
+    row4 = poly[12 + i: 12 + i + 4]
+    row4 = row4[3:]+row4[:3]
+    poly[12 + i: 12 + i + 4] = row4
+    # print(row1, a, b, c)
+    #print(row1)
+    #print(row2)
+    #print(row3)
+    #print(row4 + '\n')
+    blockNum -= 1
+    i += 16
+
+print("HERE")
 print(poly)
+
 
 
 
