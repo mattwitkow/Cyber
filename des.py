@@ -108,6 +108,24 @@ while temp > 0:
     temp -= 1
     i += 16
 print(shiftedText)
+unformatted = ''
+output.write('\n')
+output.write('Parity')
+
+def parityOf(int_type):
+    parity = 0
+    while (int_type):
+        parity = ~parity
+        int_type = int_type & (int_type - 1)
+    return(parity)
+
+
+for c in shiftedText:
+
+    unformatted = (bin(ord(c)))
+    unformatted = unformatted[2:].zfill(8)
+    print(int(unformatted))
+    print(parityOf(int(unformatted)))
 
 
 
