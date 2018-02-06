@@ -120,12 +120,34 @@ def parityOf(int_type):
     return(parity)
 
 
-for c in shiftedText:
 
+def checkParity(string_bits):
+    counter = 0
+    for c in string_bits:
+        if c == "1":
+            counter += 1
+    return (counter % 2) == 0
+
+
+for c in shiftedText:
+    print(c)
     unformatted = (bin(ord(c)))
     unformatted = unformatted[2:].zfill(8)
-    print(int(unformatted))
-    print(parityOf(int(unformatted)))
+    if not checkParity(unformatted):
+        print("odd")
+        unformatted = "1" + unformatted[1:]
+    print(unformatted)
+
+
+
+
+
+
+
+
+
+
+
 
 
 
