@@ -128,30 +128,86 @@ def checkParity(string_bits):
             counter += 1
     return (counter % 2) == 0
 
-
+hexstring = ""
+binstring = ""
 for c in shiftedText:
-    print(c)
+    #print(c)
     unformatted = (bin(ord(c)))
     unformatted = unformatted[2:].zfill(8)
     if not checkParity(unformatted):
-        print("odd")
+        #print("odd")
         unformatted = "1" + unformatted[1:]
-    print(unformatted)
+    #print(unformatted)
+    binstring += unformatted
+    #print("{0:0>2X}".format(int(unformatted, 2)))
+    hexstring += "{0:0>2X}".format(int(unformatted, 2))
+    #print(hex(int(unformatted)))
+    #hexstring += hex(int(unformatted))
+    #print(unformatted)
+print(binstring)
+print(hexstring)
 
 
 
+hex2bin_map = {
+   "0":"0000",
+   "1":"0001",
+   "2":"0010",
+   "3":"0011",
+   "4":"0100",
+   "5":"0101",
+   "6":"0110",
+   "7":"0111",
+   "8":"1000",
+   "9":"1001",
+   "A":"1010",
+   "B":"1011",
+   "C":"1100",
+   "D":"1101",
+   "E":"1110",
+   "F":"1111",
+}
 
+#hex block num
+#takes in hex string like EE and converts it to byte type
+def hexToByte(hexstring):
+    binasstring = hex2bin_map[hexstring[0:1]] + hex2bin_map[hexstring[1:2]]
+    #print(binasstring)
+    return int(binasstring, 2)
+    #return '{0:08b}'.format(int(binasstring, 2))
+  
 
+print(hexstring[0:2])
+print(hexToByte(hexstring[0:2]))
 
+temp = blockNum
+text = ""
+i = 0
+while temp > 0:
+    displayCol = ""
+    row1 = hexstring[0 + i: i + 8] + '\n'
+    text += row1
+    displayCol += row1 + '\n'
+    row2 = hexstring[8 + i:8 + i + 8]  + '\n'
+    #row2 = row2[1:]+row2[:1]
 
+    text += row2
+    displayCol += row2 + '\n'
+    row3 = hexstring[16 + i:16 + i + 8] + '\n'
+    #row3 = row3[2:]+row3[:2]
 
+    text += row3
+    displayCol += row3 + '\n'
+    row4 = hexstring[24 + i: 24 + i + 8] + '\n'
+    #row4 = row4[3:]+row4[:3]
 
-
-
-
-
-
-
+    displayCol += row4 + '\n'
+    text += row4
+    #output.write(displayCol)
+    temp -= 1
+    i += 32
+    text += '\n'
+print(text)
 
 
 
