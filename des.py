@@ -1,5 +1,6 @@
 import string
 import collections
+#import numpy as np
 #checks if files exist. If they do, try to open them
 try:
     plain = open("input1.txt", "r")
@@ -175,18 +176,47 @@ def hexToByte(hexstring):
     #print(binasstring)
     return int(binasstring, 2)
     #return '{0:08b}'.format(int(binasstring, 2))
-  
 
-print(hexstring[0:2])
-print(hexToByte(hexstring[0:2]))
+def rgfMul(byteNum, multBy):
+    if multBy != 2 and multBy != 3:
+        return
+    sigGreater = False
+    if byteNum >= 128:
+        sigGreater = True
+    
+    mask = 2 ** 8 - 1
+    print(byteNum)
+    doubled = (byteNum << 1) & mask
+
+    #check if msb is 0
+    #print(bin(doubled))
+    #print(doubled)
+    
+    if multBy == 2 and (sigGreater == False):
+        return doubled
+    if multBy == 2:
+        return doubled ^ int('00011011',2)
+    if multBy == 3 and (sigGreater == False):
+        return doubled ^ byteNum
+    else:
+        return (doubled ^ byteNum) ^ int('00011011',2)
+    return
+print('rgf below')
+#print(rgfMul(hexToByte(hexstring[0:2]),2))
+print(rgfMul(175, 3))
+#print(hexstring[0:2])
+#print(hexToByte(hexstring[0:2]))
+
 
 temp = blockNum
 text = ""
 i = 0
 while temp > 0:
+    blockyboi = ''
     displayCol = ""
     row1 = hexstring[0 + i: i + 8] + '\n'
     text += row1
+
     displayCol += row1 + '\n'
     row2 = hexstring[8 + i:8 + i + 8]  + '\n'
     #row2 = row2[1:]+row2[:1]
@@ -207,7 +237,11 @@ while temp > 0:
     temp -= 1
     i += 32
     text += '\n'
+
+
 print(text)
+
+
 
 
 
