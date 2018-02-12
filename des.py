@@ -1,12 +1,11 @@
 import collections
 import string
 import numpy as np
-import sys
 #checks if files exist. If they do, try to open them
 try:
-    plain = open("input1.txt", "r")
-    key = open("key1.txt", "r")
-    output = open("output1.txt", "w")
+    plain = open("input.txt", "r")
+    key = open("key.txt", "r")
+    output = open("output.txt", "w")
 except IOError:
     print('Could not find a file')
     exit()
@@ -22,8 +21,15 @@ except IOError:
 for c in string.punctuation:
     pt = pt.replace(c, "")
     pt = pt.replace(" ", "")
-print(pt)
 
+
+#pt = pt.translate(string.punctuation)
+print(pt)
+exclude = set(string.punctuation)
+pt = ''.join(ch for ch in pt if ch not in exclude)
+pt = pt.replace('\n', '').replace('\r', '')
+output.write("preprocessing" + '\n')
+output.write(pt + '\n')
 # building vigenere square. Pulled from https://stackoverflow.com/questions/19882621/for-kasiski-test-how-to-implement-26x26-table-in-python
 
 def vigsquare(printable=False):
@@ -109,6 +115,7 @@ while temp > 0:
     output.write(displayCol)
     temp -= 1
     i += 16
+    output.write('\n')
 
 unformatted = ''
 output.write('\n')
@@ -268,18 +275,18 @@ while temp > 0:
     counter = 0
     np.set_printoptions(formatter={'object': hex})
     print(mixedmatrix)
-    i = 0
-    j = 0
+    outer = 0
+    inner = 0
 
-    for i in range(4):
-        for j in range(4):
-            mixedoutput += hex(mixedmatrix[i][j])[2:] + ' '
-            if j == 3:
+    for outer in range(4):
+        for inner in range(4):
+            mixedoutput += hex(mixedmatrix[outer][inner])[2:] + ' '
+            if inner == 3:
                 mixedoutput += '\n'
-            if i == 3 and j == 3:
-                mixedoutput += '\n'
-            j += 1
-        i += 1
+            inner += 1
+        if outer == 3:
+            mixedoutput += '\n'
+        outer += 1
 output.write("mixed output" + '\n')
 print(mixedoutput)
 output.write(mixedoutput)
