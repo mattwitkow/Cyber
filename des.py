@@ -17,19 +17,16 @@ except IOError:
     print('Could not read a file')
     exit()
 
-
+#text cleanup
 for c in string.punctuation:
     pt = pt.replace(c, "")
     pt = pt.replace(" ", "")
-
-
-#pt = pt.translate(string.punctuation)
-print(pt)
 exclude = set(string.punctuation)
 pt = ''.join(ch for ch in pt if ch not in exclude)
 pt = pt.replace('\n', '').replace('\r', '')
 output.write("preprocessing" + '\n')
 output.write(pt + '\n')
+
 # building vigenere square. Pulled from https://stackoverflow.com/questions/19882621/for-kasiski-test-how-to-implement-26x26-table-in-python
 
 def vigsquare(printable=False):
@@ -59,15 +56,11 @@ def vigenere(row, column):
     rowindex = alpha.find(row)
     columnindex = alpha.find(column)
     return vigsquare()[rowindex*26 + columnindex]
-
-print(vigsquare(printable=True))
-# print(vigenere('L', 'G'))
-# mnext step-run vigenere(plaintext, key) character by character until the end of the plain text.
-# Repeat the key when needed(every 16 chars)
 i = 0
-
 poly = ''
 output.write("Poly Sub" + '\n')
+# run vigenere(plaintext, key) character by character until the end of the plain text.
+# Repeat the key when needed(every 16 chars)
 # i val also helps with the padding step
 for c in pt:
     if i == 16:
@@ -92,6 +85,7 @@ shiftedText = ""
 output.write('\n')
 output.write("Shifting" + '\n')
 temp = blockNum
+# breaks up the text into rows and slices strings from the front and appends to original string to 'shift'
 while temp > 0:
     displayCol = ""
     row1 = poly[0 + i: i + 4]
@@ -120,16 +114,7 @@ while temp > 0:
 unformatted = ''
 output.write('\n')
 output.write('Parity' + '\n')
-
-def parityOf(int_type):
-    parity = 0
-    while (int_type):
-        parity = ~parity
-        int_type = int_type & (int_type - 1)
-    return(parity)
-
-
-
+#parity checker
 def checkParity(string_bits):
     counter = 0
     for c in string_bits:
@@ -139,15 +124,17 @@ def checkParity(string_bits):
 
 hexstring = ""
 binstring = ""
+# creates a string in hex of the text at this point(strips 0x off of hex values as well)
+
 for c in shiftedText:
     unformatted = (bin(ord(c)))
     unformatted = unformatted[2:].zfill(8)
-    if not checkParity(unformatted):
-        #print("odd")
+    if not checkParity(unformatted):    # turns first bit to a 1 if parity was odd
         unformatted = "1" + unformatted[1:]
     binstring += unformatted
     hexstring += "{0:0>2X}".format(int(unformatted, 2))
 
+# This data structure allows for high speed hex to binary conversions
 hex2bin_map = {
    "0":"0000",
    "1":"0001",
@@ -171,38 +158,26 @@ hex2bin_map = {
 #takes in hex string like EE and converts it to byte type
 def hexToByte(hexstring):
     binasstring = hex2bin_map[hexstring[0:1]] + hex2bin_map[hexstring[1:2]]
-    #print(binasstring)
     return int(binasstring, 2)
-    #return '{0:08b}'.format(int(binasstring, 2))
 
+#
 def rgfMul(byteNum, multBy):
     if multBy != 2 and multBy != 3:
         return
     sigGreater = False
-    if byteNum >= 128:
+    if byteNum >= 128:      # sees if msb == 1
         sigGreater = True
     
     mask = 2 ** 8 - 1
-    doubled = (byteNum << 1) & mask
-
-    #check if msb is 0
-    #print(bin(doubled))
-    #print(doubled)
-    
-    if multBy == 2 and not sigGreater:
+    doubled = (byteNum << 1) & mask # shift one bit
+    if multBy == 2 and not sigGreater: # done if msb != 1
         return doubled
     if multBy == 2:
-        return doubled ^ int('00011011',2)
+        return doubled ^ int('00011011',2) # msb == 1 so XOR with 00011011
     if multBy == 3 and not sigGreater:
         return doubled ^ byteNum
     else:
         return (doubled ^ byteNum) ^ int('00011011',2)
-#print('rgf below')
-#print(rgfMul(hexToByte(hexstring[0:2]),2))
-#print(rgfMul(175, 3))
-#print(hexstring[0:2])
-#print(hexToByte(hexstring[0:2]))
-
 
 temp = blockNum
 text = ""
@@ -226,25 +201,22 @@ while temp > 0:
     displayCol += row1
     row2 = hexstring[8 + i:8 + i + 8]  + '\n'
     fillRow(matrix, 1, row2)
-    #row2 = row2[1:]+row2[:1]
 
     text += row2
     displayCol += row2
     row3 = hexstring[16 + i:16 + i + 8] + '\n'
     fillRow(matrix, 2, row3)
-    #row3 = row3[2:]+row3[:2]
 
     text += row3
     displayCol += row3
     row4 = hexstring[24 + i: 24 + i + 8] + '\n'
     fillRow(matrix, 3, row4)
-    #row4 = row4[3:]+row4[:3]
 
     displayCol += row4
     text += row4
     output.write(displayCol + "\n")
     temp -= 1
-    i += 32
+    i += 32 # 32 instead of 16 because we're writing the characters in hex at this point.
     text += '\n'
 
     #now that the matrix is filled with string hex values, begin mix columns
@@ -255,26 +227,27 @@ while temp > 0:
         mixedmatrix[0, counter] = rgfMul(hexToByte(matrix[0, counter]), 2) ^ rgfMul(hexToByte(matrix[1, counter]), 3) ^\
                                   hexToByte(matrix[2, counter]) ^ hexToByte(matrix[3, counter])
         counter += 1
-    #col1
+    #do col1
     counter = 0
     while counter < 4:
         mixedmatrix[1, counter] = hexToByte(matrix[0,counter]) ^ rgfMul(hexToByte(matrix[1,counter]),2) ^ \
                                   rgfMul(hexToByte(matrix[2,counter]),3) ^ hexToByte(matrix[3,counter])
         counter+=1
-    #col2
+    # do col2
     counter = 0
     while counter < 4:
         mixedmatrix[2, counter] = hexToByte(matrix[0,counter]) ^ hexToByte(matrix[1,counter]) ^\
                                   rgfMul(hexToByte(matrix[2, counter]), 2) ^ rgfMul(hexToByte(matrix[3,counter]),3)
         counter += 1
     counter = 0
+    # do col 3
     while counter < 4:
         mixedmatrix[3, counter] = rgfMul(hexToByte(matrix[0, counter]), 3) ^ hexToByte(matrix[1,counter])^\
                                   hexToByte(matrix[2, counter]) ^ rgfMul(hexToByte(matrix[3, counter]), 2)
         counter += 1
     counter = 0
     np.set_printoptions(formatter={'object': hex})
-    print(mixedmatrix)
+    #print(mixedmatrix)
     outer = 0
     inner = 0
 
