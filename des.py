@@ -1,6 +1,7 @@
-import string
 import collections
-#import numpy as np
+import string
+import numpy as np
+
 #checks if files exist. If they do, try to open them
 try:
     plain = open("input1.txt", "r")
@@ -108,7 +109,7 @@ while temp > 0:
     output.write(displayCol)
     temp -= 1
     i += 16
-print(shiftedText)
+
 unformatted = ''
 output.write('\n')
 output.write('Parity')
@@ -142,11 +143,7 @@ for c in shiftedText:
     binstring += unformatted
     #print("{0:0>2X}".format(int(unformatted, 2)))
     hexstring += "{0:0>2X}".format(int(unformatted, 2))
-    #print(hex(int(unformatted)))
-    #hexstring += hex(int(unformatted))
-    #print(unformatted)
-print(binstring)
-print(hexstring)
+
 
 
 
@@ -185,25 +182,23 @@ def rgfMul(byteNum, multBy):
         sigGreater = True
     
     mask = 2 ** 8 - 1
-    print(byteNum)
     doubled = (byteNum << 1) & mask
 
     #check if msb is 0
     #print(bin(doubled))
     #print(doubled)
     
-    if multBy == 2 and (sigGreater == False):
+    if multBy == 2 and not sigGreater:
         return doubled
     if multBy == 2:
         return doubled ^ int('00011011',2)
-    if multBy == 3 and (sigGreater == False):
+    if multBy == 3 and not sigGreater:
         return doubled ^ byteNum
     else:
         return (doubled ^ byteNum) ^ int('00011011',2)
-    return
-print('rgf below')
+#print('rgf below')
 #print(rgfMul(hexToByte(hexstring[0:2]),2))
-print(rgfMul(175, 3))
+#print(rgfMul(175, 3))
 #print(hexstring[0:2])
 #print(hexToByte(hexstring[0:2]))
 
@@ -211,24 +206,37 @@ print(rgfMul(175, 3))
 temp = blockNum
 text = ""
 i = 0
+def fillRow(mtrix, rownum, text):
+    i = 0 # for the columns of the matrix
+    j = 0 # for actual text
+    while i < 4:
+        mtrix[rownum, i] = text[j:j+2]
+        j += 2
+        i += 1
+
 while temp > 0:
-    blockyboi = ''
+    matrix = np.zeros(shape=(4, 4), dtype=object)
+
     displayCol = ""
     row1 = hexstring[0 + i: i + 8] + '\n'
+    fillRow(matrix, 0, row1)#check this later to see how \n is handled
     text += row1
 
     displayCol += row1 + '\n'
     row2 = hexstring[8 + i:8 + i + 8]  + '\n'
+    fillRow(matrix, 1, row2)
     #row2 = row2[1:]+row2[:1]
 
     text += row2
     displayCol += row2 + '\n'
     row3 = hexstring[16 + i:16 + i + 8] + '\n'
+    fillRow(matrix, 2, row3)
     #row3 = row3[2:]+row3[:2]
 
     text += row3
     displayCol += row3 + '\n'
     row4 = hexstring[24 + i: 24 + i + 8] + '\n'
+    fillRow(matrix, 3, row4)
     #row4 = row4[3:]+row4[:3]
 
     displayCol += row4 + '\n'
@@ -238,11 +246,33 @@ while temp > 0:
     i += 32
     text += '\n'
 
-
-print(text)
-
-
-
-
+    #now that the matrix is filled with string hex values, begin mix columns
+    mixedmatrix = np.zeros(shape=(4, 4), dtype=object)
+    #do col 0
+    counter = 0
+    while counter < 4:
+        mixedmatrix[0, counter] = rgfMul(hexToByte(matrix[0, counter]), 2) ^ rgfMul(hexToByte(matrix[1, counter]), 3) ^\
+                                  hexToByte(matrix[2, counter]) ^ hexToByte(matrix[3, counter])
+        counter += 1
+    #col1
+    counter = 0
+    while counter < 4:
+        mixedmatrix[1, counter] = hexToByte(matrix[0,counter]) ^ rgfMul(hexToByte(matrix[1,counter]),2) ^ \
+                                  rgfMul(hexToByte(matrix[2,counter]),3) ^ hexToByte(matrix[3,counter])
+        counter+=1
+    #col2
+    counter = 0
+    while counter < 4:
+        mixedmatrix[2, counter] = hexToByte(matrix[0,counter]) ^ hexToByte(matrix[1,counter]) ^\
+                                  rgfMul(hexToByte(matrix[2, counter]), 2) ^ rgfMul(hexToByte(matrix[3,counter]),3)
+        counter += 1
+    counter = 0
+    while counter < 4:
+        mixedmatrix[3, counter] = rgfMul(hexToByte(matrix[0, counter]), 3) ^ hexToByte(matrix[1,counter])^\
+                                  hexToByte(matrix[2, counter]) ^ rgfMul(hexToByte(matrix[3, counter]), 2)
+        counter += 1
+    counter = 0
+    np.set_printoptions(formatter={'object': hex})
+    print(mixedmatrix)
 
 
