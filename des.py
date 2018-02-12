@@ -1,7 +1,7 @@
 import collections
 import string
 import numpy as np
-
+import sys
 #checks if files exist. If they do, try to open them
 try:
     plain = open("input1.txt", "r")
@@ -112,7 +112,7 @@ while temp > 0:
 
 unformatted = ''
 output.write('\n')
-output.write('Parity')
+output.write('Parity' + '\n')
 
 def parityOf(int_type):
     parity = 0
@@ -133,19 +133,13 @@ def checkParity(string_bits):
 hexstring = ""
 binstring = ""
 for c in shiftedText:
-    #print(c)
     unformatted = (bin(ord(c)))
     unformatted = unformatted[2:].zfill(8)
     if not checkParity(unformatted):
         #print("odd")
         unformatted = "1" + unformatted[1:]
-    #print(unformatted)
     binstring += unformatted
-    #print("{0:0>2X}".format(int(unformatted, 2)))
     hexstring += "{0:0>2X}".format(int(unformatted, 2))
-
-
-
 
 hex2bin_map = {
    "0":"0000",
@@ -213,7 +207,7 @@ def fillRow(mtrix, rownum, text):
         mtrix[rownum, i] = text[j:j+2]
         j += 2
         i += 1
-
+mixedoutput = ''
 while temp > 0:
     matrix = np.zeros(shape=(4, 4), dtype=object)
 
@@ -222,26 +216,26 @@ while temp > 0:
     fillRow(matrix, 0, row1)#check this later to see how \n is handled
     text += row1
 
-    displayCol += row1 + '\n'
+    displayCol += row1
     row2 = hexstring[8 + i:8 + i + 8]  + '\n'
     fillRow(matrix, 1, row2)
     #row2 = row2[1:]+row2[:1]
 
     text += row2
-    displayCol += row2 + '\n'
+    displayCol += row2
     row3 = hexstring[16 + i:16 + i + 8] + '\n'
     fillRow(matrix, 2, row3)
     #row3 = row3[2:]+row3[:2]
 
     text += row3
-    displayCol += row3 + '\n'
+    displayCol += row3
     row4 = hexstring[24 + i: 24 + i + 8] + '\n'
     fillRow(matrix, 3, row4)
     #row4 = row4[3:]+row4[:3]
 
-    displayCol += row4 + '\n'
+    displayCol += row4
     text += row4
-    #output.write(displayCol)
+    output.write(displayCol + "\n")
     temp -= 1
     i += 32
     text += '\n'
@@ -274,5 +268,20 @@ while temp > 0:
     counter = 0
     np.set_printoptions(formatter={'object': hex})
     print(mixedmatrix)
+    i = 0
+    j = 0
+
+    for i in range(4):
+        for j in range(4):
+            mixedoutput += hex(mixedmatrix[i][j])[2:] + ' '
+            if j == 3:
+                mixedoutput += '\n'
+            if i == 3 and j == 3:
+                mixedoutput += '\n'
+            j += 1
+        i += 1
+output.write("mixed output" + '\n')
+print(mixedoutput)
+output.write(mixedoutput)
 
 
