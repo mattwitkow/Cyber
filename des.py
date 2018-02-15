@@ -1,6 +1,5 @@
 import collections
 import string
-import numpy as np
 #checks if files exist. If they do, try to open them
 try:
     plain = open("input.txt", "r")
@@ -186,13 +185,13 @@ def fillRow(mtrix, rownum, text):
     i = 0 # for the columns of the matrix
     j = 0 # for actual text
     while i < 4:
-        mtrix[rownum, i] = text[j:j+2]
+        mtrix[rownum][i] = text[j:j+2]
         j += 2
         i += 1
 mixedoutput = ''
 while temp > 0:
-    matrix = np.zeros(shape=(4, 4), dtype=object)
 
+    matrix = [[0 for x in range(4)] for y in range(4)]
     displayCol = ""
     row1 = hexstring[0 + i: i + 8] + '\n'
     fillRow(matrix, 0, row1)#check this later to see how \n is handled
@@ -220,34 +219,33 @@ while temp > 0:
     text += '\n'
 
     #now that the matrix is filled with string hex values, begin mix columns
-    mixedmatrix = np.zeros(shape=(4, 4), dtype=object)
+    #mixedmatrix = np.zeros(shape=(4, 4), dtype=object)
+    mixedmatrix = [[0 for x in range(4)] for y in range(4)]
     #do col 0
     counter = 0
     while counter < 4:
-        mixedmatrix[0, counter] = rgfMul(hexToByte(matrix[0, counter]), 2) ^ rgfMul(hexToByte(matrix[1, counter]), 3) ^\
-                                  hexToByte(matrix[2, counter]) ^ hexToByte(matrix[3, counter])
+        mixedmatrix[0][counter] = rgfMul(hexToByte(matrix[0][counter]), 2) ^ rgfMul(hexToByte(matrix[1][counter]), 3) ^\
+                                  hexToByte(matrix[2][counter]) ^ hexToByte(matrix[3][counter])
         counter += 1
     #do col1
     counter = 0
     while counter < 4:
-        mixedmatrix[1, counter] = hexToByte(matrix[0,counter]) ^ rgfMul(hexToByte(matrix[1,counter]),2) ^ \
-                                  rgfMul(hexToByte(matrix[2,counter]),3) ^ hexToByte(matrix[3,counter])
+        mixedmatrix[1][counter] = hexToByte(matrix[0][counter]) ^ rgfMul(hexToByte(matrix[1][counter]),2) ^ \
+                                  rgfMul(hexToByte(matrix[2][counter]),3) ^ hexToByte(matrix[3][counter])
         counter+=1
     # do col2
     counter = 0
     while counter < 4:
-        mixedmatrix[2, counter] = hexToByte(matrix[0,counter]) ^ hexToByte(matrix[1,counter]) ^\
-                                  rgfMul(hexToByte(matrix[2, counter]), 2) ^ rgfMul(hexToByte(matrix[3,counter]),3)
+        mixedmatrix[2][counter] = hexToByte(matrix[0][counter]) ^ hexToByte(matrix[1][counter]) ^\
+                                  rgfMul(hexToByte(matrix[2][counter]), 2) ^ rgfMul(hexToByte(matrix[3][counter]),3)
         counter += 1
     counter = 0
     # do col 3
     while counter < 4:
-        mixedmatrix[3, counter] = rgfMul(hexToByte(matrix[0, counter]), 3) ^ hexToByte(matrix[1,counter])^\
-                                  hexToByte(matrix[2, counter]) ^ rgfMul(hexToByte(matrix[3, counter]), 2)
+        mixedmatrix[3][counter] = rgfMul(hexToByte(matrix[0][ counter]), 3) ^ hexToByte(matrix[1][counter])^\
+                                  hexToByte(matrix[2][ counter]) ^ rgfMul(hexToByte(matrix[3][counter]), 2)
         counter += 1
     counter = 0
-    np.set_printoptions(formatter={'object': hex})
-    #print(mixedmatrix)
     outer = 0
     inner = 0
 
